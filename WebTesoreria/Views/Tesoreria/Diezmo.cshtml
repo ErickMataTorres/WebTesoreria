@@ -1,0 +1,448 @@
+﻿@{
+    ViewBag.Title = "Diezmo";
+}
+<h1 style="color:white; text-align:center;">Diezmos</h1>
+<style>
+    .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+    }
+
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+
+            /* Change background color of buttons on hover */
+            .tab button:hover {
+                background-color: #ddd;
+            }
+
+            /* Create an active/current tablink class */
+            .tab button.active {
+                background-color: #ccc;
+            }
+
+    /* Style the tab content */
+    .tabcontent {
+        display: none;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-top: none;
+    }
+
+    .tabcontent {
+        animation: fadeEffect 1s; /* Fading effect takes 1 second */
+    }
+
+    /* Go from zero to full opacity */
+    @@keyframes fadeEffect {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    #Entradas, #Salidas {
+        overflow: scroll;
+        height: 800px;
+    }
+
+    label {
+        color: white;
+    }
+</style>
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalNuevoDiezmo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="color:white;">Nuevo Diezmo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-inline">
+                    <label class="col-md-4">Id:</label><input type="text" class="form-control col-md-8" id="txtId" disabled="disabled" />
+                </div>
+                <br />
+                <div class="form-inline">
+                    <label class="col-md-4">Descripción:</label><input type="text" class="form-control col-md-8" id="txtDescripcion" />
+                </div>
+                <br />
+                <div class="form-inline">
+                    <label class="col-md-4">Dinero:</label><input type="text" class="form-control col-md-8" id="txtDinero" />
+                </div>
+                <br />
+                <div class="form-inline">
+                    <label class="col-md-4">Fecha Ahorrado:</label><input type="date" class="form-control col-md-8" id="txtFechaAhorrado" />
+                </div>
+                <br />
+                <div class="form-inline">
+                    <label class="col-md-4">Fecha Modificado:</label><input type="date" class="form-control col-md-8" id="txtFechaModificado" />
+                </div>
+                <br />
+                <div class="form-inline">
+                    <label class="col-md-4">Concepto:</label><select class="form-control col-md-8" id="cbConceptos"><option value="ENTRADA">Entrada</option><option value="SALIDA">Salida</option></select>
+                </div>
+                <br />
+                <div class="form-inline">
+                    <label class="col-md-4">Usuario:</label><select id="cbUsuarios" class="form-control col-md-8"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarDiezmo">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal" tabindex="-1" role="dialog" id="modalGuardado">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Diezmo Registrado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBodyGuardado">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btnAceptarGuardado">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'Entradas')" id="defaultOpen">Entradas</button>
+    <button class="tablinks" onclick="openCity(event, 'Salidas')">Salidas</button>
+    <button class="tablinks" onclick="openCity(event, 'Totales')">Total</button>
+    <button class="tablinks" onclick="NuevoDiezmo()">Nuevo</button>
+</div>
+
+
+
+
+
+
+
+<!-- Tab content -->
+<div id="Entradas" class="tabcontent">
+    <div class="form-inline">
+        <label class="col-md-2" style="color:red;">Total Entradas:</label><input type="text" class="form-control col-md-3" id="txtTabTotalEntradas" disabled="disabled" />
+    </div>
+    <table class="table table-sm table-dark table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">TotalCantidad</th>
+                <th scope="col">FechaAhorrado</th>
+                <th scope="col">FechaModificado</th>
+                <th scope="col">Concepto</th>
+                <th scope="col">QuienCapturo</th>
+            </tr>
+        </thead>
+        <tbody id="tabEntradas">
+        </tbody>
+    </table>
+</div>
+
+<div id="Salidas" class="tabcontent">
+    <div class="form-inline">
+        <label class="col-md-2" style="color:red;">Total Salidas:</label><input type="text" class="form-control col-md-3" id="txtTabTotalSalidas" disabled="disabled" />
+    </div>
+    <table class="table table-sm table-dark table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">TotalCantidad</th>
+                <th scope="col">FechaAhorrado</th>
+                <th scope="col">FechaModificado</th>
+                <th scope="col">Concepto</th>
+                <th scope="col">QuienCapturo</th>
+            </tr>
+        </thead>
+        <tbody id="tabSalidas">
+        </tbody>
+    </table>
+</div>
+
+<div id="Totales" class="tabcontent">
+    <div class="form-inline">
+        <label style="color:white;" class="col-md-4">Total Entradas:</label><input class="form-control col-md-4" type="text" id="txtTotalEntradas" disabled="disabled" />
+    </div>
+    <br />
+    <div class="form-inline">
+        <label style="color:white;" class="col-md-4">Total Salidas:</label><input class="form-control col-md-4" type="text" id="txtTotalSalidas" disabled="disabled" />
+    </div>
+    <hr style="border-color:white;" />
+    <br />
+    <div class="form-inline">
+        <label style="color:red;" class="col-md-4">Total:</label><input class="form-control col-md-4" type="text" id="txtTotal" disabled="disabled" />
+    </div>
+</div>
+
+
+
+
+<script>
+    var apiUrl = "https://localhost:44301";
+    document.getElementById("defaultOpen").click();
+    $(document).ready(function () {
+        TablaEntradas();
+        TablaSalidas();
+        TotalEntradas();
+        TotalSalidas();
+        Total();
+        TabTotalEntradas();
+        TabTotalSalidas();
+    });
+            function TabTotalEntradas() {
+        var param = {
+            Concepto: "ENTRADA"
+        };
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Tesoreria/TabTotalDiezmo",
+            data: param,
+            success: function (r, s, j) {
+                $("#txtTabTotalEntradas").val(r);
+            },
+            dataType:"Json"
+        });
+    }
+        function TabTotalSalidas() {
+        var param = {
+            Concepto: "SALIDA"
+        };
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Tesoreria/TabTotalDiezmo",
+            data: param,
+            success: function (r, s, j) {
+                $("#txtTabTotalSalidas").val(r);
+            },
+            dataType:"Json"
+        });
+    }
+    function LimpiarNuevoDiezmo() {
+        $("#txtId").val('');
+        $("#txtDescripcion").val('');
+        $("#txtDinero").val('');
+        $("#txtFechaAhorrado").val(Date.now);
+        $("#txtFechaModificado").val(Date.now);
+    }
+    function NuevoDiezmo() {
+        $("#modalNuevoDiezmo").modal("show");
+        $("#txtId").val("Nuevo");
+        ComboBoxUsuario();
+        $("#btnGuardarDiezmo").click(function () {
+            var id;
+            if ($("#txtId").val() == "Nuevo") {
+                id = -1;
+            } else {
+                id = $("#txtId").val();
+            }
+            var params = {
+                Id: id,
+                Descripcion: $("#txtDescripcion").val().toUpperCase(),
+                Cantidad: $("#txtDinero").val(),
+                FechaAhorrado: $("#txtFechaAhorrado").val(),
+                FechaModificado: $("#txtFechaModificado").val(),
+                Concepto: $("#cbConceptos").val(),
+                Usuario: $("#cbUsuarios").val()
+            };
+            $.ajax({
+                type: "POST",
+                url: apiUrl + "/Tesoreria/GuardarDiezmo",
+                data: params,
+                success: function (r, s, j) {
+                    if (r.startsWith("Ok")) {
+                        let modalBodyGuardado = document.querySelector("#modalBodyGuardado");
+                        modalBodyGuardado.innerHTML = "";
+                        modalBodyGuardado.innerHTML = "Se ha guardado correctamente";
+                        $("#modalGuardado").modal("show");
+                        TablaEntradas();
+                        TablaSalidas();
+                        TotalEntradas();
+                        TotalSalidas();
+                        Total();
+                        $("#btnAceptarGuardado").click(function () {
+                            $("#modalNuevoDiezmo").modal("hide");
+                        });
+                        LimpiarNuevoDiezmo();
+                    }
+                    else {
+                        let modalBodyGuardado = document.querySelector("#modalBodyGuardado");
+                        modalBodyGuardado.innerHTML = "";
+                        modalBodyGuardado.innerHTML = r;
+                    }
+                },
+                dataType: "Text"
+            });
+        });
+    }
+    function ComboBoxUsuario() {
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Usuario/ListaUsuarios",
+            data: "",
+            success: function (r, s, j) {
+                let cbUsuarios = document.querySelector("#cbUsuarios");
+                cbUsuarios.innerHTML = "";
+                for (let datos of r) {
+                    cbUsuarios.innerHTML +=
+                            `
+                                <option value="${datos.Id}">${datos.Nombre}</option>
+                            `;
+                }
+            },
+            dataType: "Json"
+        });
+    }
+    function Total() {
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Tesoreria/TotalDiezmoWeb",
+            data: "",
+            success: function (r, s, j) {
+                $("#txtTotal").val(r);
+            },
+            dataType: "Json"
+        });
+    }
+    function TotalEntradas() {
+        var param = {
+            Concepto: "ENTRADA"
+        };
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Tesoreria/TotalesDiezmo",
+            data: param,
+            success: function (r, s, j) {
+                $("#txtTotalEntradas").val(r);
+            },
+            dataType: "Json"
+        });
+    }
+    function TotalSalidas() {
+        var param = {
+            Concepto: "SALIDA"
+        };
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Tesoreria/TotalesDiezmo",
+            data: param,
+            success: function (r, s, j) {
+                $("#txtTotalSalidas").val(r);
+            },
+            dataType: "Json"
+        });
+    }
+    function TablaSalidas() {
+        var param = {
+            Concepto: "SALIDA"
+        };
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Tesoreria/ListaDiezmo",
+            data: param,
+            success: function (r, s, j) {
+                let tabEntradas = document.querySelector("#tabSalidas");
+                tabEntradas.innerHTML = "";
+                for (let datos of r) {
+                    tabEntradas.innerHTML +=
+                        `
+                                                        <tr>
+                                                            <td>${datos.Id}</td>
+                                                            <td>${datos.Descripcion}</td>
+                                                            <td>${datos.Cantidad}</td>
+                                                            <td>${datos.TotalCantidad}</td>
+                                                            <td>${datos.FechaAhorrado}</td>
+                                                            <td>${datos.FechaModificado}</td>
+                                                            <td>${datos.Concepto}</td>
+                                                            <td>${datos.QuienCapturo}</td>
+                                                        </tr>
+                                                    `;
+                }
+            },
+            dataType: "Json"
+        });
+    }
+    function TablaEntradas() {
+        var param = {
+            Concepto: "ENTRADA"
+        };
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Tesoreria/ListaDiezmo",
+            data: param,
+            success: function (r, s, j) {
+                let tabEntradas = document.querySelector("#tabEntradas");
+                tabEntradas.innerHTML = "";
+                for (let datos of r) {
+                    tabEntradas.innerHTML +=
+                        `
+                                                        <tr>
+                                                            <td>${datos.Id}</td>
+                                                            <td>${datos.Descripcion}</td>
+                                                            <td>${datos.Cantidad}</td>
+                                                            <td>${datos.TotalCantidad}</td>
+                                                            <td>${datos.FechaAhorrado}</td>
+                                                            <td>${datos.FechaModificado}</td>
+                                                            <td>${datos.Concepto}</td>
+                                                            <td>${datos.QuienCapturo}</td>
+                                                        </tr>
+                                                    `;
+                }
+            },
+            dataType: "Json"
+        });
+    }
+
+    function openCity(evt, cityName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+</script>

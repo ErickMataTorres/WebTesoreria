@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Registro";
+}
+
+<style>
+    table {
+        animation: fadeEffect 1s; /* Fading effect takes 1 second */
+    }
+
+    /* Go from zero to full opacity */
+    @@keyframes fadeEffect {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+
+
+<h1 style="text-align:center; color:white;">Usuarios</h1>
+<table class="table table-sm table-dark table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Dirección</th>
+            <th scope="col">Modificar / Borrar</th>
+        </tr>
+    </thead>
+    <tbody id="tablaUsuarios">
+    </tbody>
+</table>
+
+<script>
+    var apiUrl = "https://localhost:44301";
+    $(document).ready(function () {
+        TablaUsuarios();
+    });
+    function TablaUsuarios() {
+        $.ajax({
+            type: "POST",
+            url: apiUrl + "/Usuario/TablaUsuarios",
+            data: "",
+            success: function (r, s, j) {
+                let tablaUsuarios = document.querySelector("#tablaUsuarios");
+                tablaUsuarios.innerHTML = "";
+                for (let datos of r) {
+                    tablaUsuarios.innerHTML +=
+                        `
+                            <tr>
+                                <td>${datos.Id}</td>
+                                <td>${datos.Nombre}</td>
+                                <td>${datos.Telefono}</td>
+                                <td>${datos.Direccion}</td>
+                                <td><button class="btn btn-warning btn-sm">Modificar</button><button class="btn btn-danger btn-sm">Borrar</button></td>
+                            </tr>
+                        `
+                }
+            },
+            dataType:"Json"
+        });
+    }
+</script>
